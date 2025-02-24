@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head.ejs') %>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+    <div class="create-blog">
+        <h2>Edit Blog</h2>
+        <form action="/blogs/<%= blog._id %>?_method=PUT" method="POST">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="<%= blog.title %>" required>
+            <label for="snippet">snippet:</label>
+            <input type="text" id="snippet" name="snippet" value="<%= blog.snippet %>" required>
+
+            <label for="body">Body:</label>
+            <textarea id="body" name="body" required><%= blog.body %></textarea>
+
+            <a href="#" class="update-blog" data-doc="<%= blog._id %>">Update Blog</a>
+
+        </form>
+
+    </div>
+    <%- include('./partials/footer.ejs') %>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateButton = document.querySelector('.update-blog');
+        
+            updateButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default anchor behavior
+        
+                // Get the blog ID from the data attribute
+                const blogId = updateButton.getAttribute('data-doc');
+        
+                // Find the form element
+                const form = document.querySelector('form');
+        
+                // Submit the form
+                form.submit();
+            });
+        });
+        
+    </script>
+
+    
+</body>
+</html>

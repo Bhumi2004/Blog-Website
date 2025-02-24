@@ -1,0 +1,377 @@
+1.Design a Database and create required tables. For e.g. Bank, College Database?
+Ans:-
+Create Database Bank;
+use Bank;
+
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    Address VARCHAR(255),
+    Phone VARCHAR(15),
+    Email VARCHAR(100),
+    DateOfBirth DATE
+);
+
+INSERT INTO customers
+ VALUES
+(1,'John Doe', '123 Main Street, Anytown, USA', 1234567, 'john.doe@example.com', '1990-05-15'),
+(2,'Jane Smith', '456 Oak Avenue, Springfield, USA', 987654, 'jane.smith@example.com', '1985-11-20'),
+(3,'Alice Johnson', '789 Maple Drive, Metro City, USA', 555123, 'alice.johnson@example.com', '1978-03-10');
+
+select*from customers;
+
+CREATE TABLE Accounts (
+    AccountID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT,
+    AccountType VARCHAR(50),
+    Balance DECIMAL(15, 2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+INSERT INTO ACCOUNTS 
+VALUES 
+    (1,2, 'Checking', 500.50),
+    (2,3, 'Savings', 1500.75),
+    (3,1, 'Investment', 20000.00);
+
+select*from ACCOUNTS ;
+
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY AUTO_INCREMENT,
+    AccountID INT,
+    TransactionType VARCHAR(50),
+    Amount DECIMAL(15, 2),
+    TransactionDate DATETIME,
+    FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+);
+
+INSERT INTO TRANSACTIONS  
+VALUES 
+    (1, 'Deposit', 500.00, '2024-05-01 09:30:00'),
+    (2, 'Withdrawal', 100.00, '2024-05-02 14:45:00'),
+    (1, 'Transfer', 200.50, '2024-05-03 11:20:00');
+
+select*from TRANSACTIONS;
+
+CREATE TABLE Branches (
+    BranchID INT PRIMARY KEY AUTO_INCREMENT,
+    BranchName VARCHAR(100),
+    Address VARCHAR(255),
+    Phone VARCHAR(15)
+);
+INSERT INTO BRANCHES 
+VALUES 
+    (1,'Main Branch', '123 Main Street, Cityville', 12345),
+    (2,'Downtown Branch', '456 Downtown Avenue, Townsville', 98765),
+    (3,'Westside Branch', '789 Westside Road, Villageton', 5551234);
+
+select*from BRANCHES;
+
+2.Apply the constraints like Primary Key, Foreign key, NOT NULL to the tables.
+Ans:-
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100) NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    Phone VARCHAR(15),
+    Email VARCHAR(100),
+    DateOfBirth DATE NOT NULL
+);
+
+INSERT INTO customers
+ VALUES
+(1,'John Doe', '123 Main Street, Anytown, USA', 1234567, 'john.doe@example.com', '1990-05-15'),
+(2,'Jane Smith', '456 Oak Avenue, Springfield, USA', 987654, 'jane.smith@example.com', '1985-11-20'),
+(3,'Alice Johnson', '789 Maple Drive, Metro City, USA', 555123, 'alice.johnson@example.com', '1978-03-10');
+
+select*from customers;
+
+
+CREATE TABLE Accounts (
+    AccountID INT PRIMARY KEY AUTO_INCREMENT,
+    CustomerID INT NOT NULL,
+    AccountType VARCHAR(50) NOT NULL,
+    Balance DECIMAL(15, 2) DEFAULT 0.00,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+INSERT INTO ACCOUNTS 
+VALUES 
+    (1,2, 'Checking', 500.50),
+    (2,3, 'Savings', 1500.75),
+    (3,1, 'Investment', 20000.00);
+
+select*from ACCOUNTS ;
+
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY AUTO_INCREMENT,
+    AccountID INT NOT NULL,
+    TransactionType VARCHAR(50) NOT NULL,
+    Amount DECIMAL(15, 2) NOT NULL,
+    TransactionDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID)
+);
+
+INSERT INTO TRANSACTIONS  
+VALUES 
+    (1, 'Deposit', 500.00, '2024-05-01 09:30:00'),
+    (2, 'Withdrawal', 100.00, '2024-05-02 14:45:00'),
+    (1, 'Transfer', 200.50, '2024-05-03 11:20:00');
+
+select*from TRANSACTIONS;
+
+CREATE TABLE Branches (
+    BranchID INT PRIMARY KEY AUTO_INCREMENT,
+    BranchName VARCHAR(100) NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    Phone VARCHAR(15) NOT NULL
+);
+
+INSERT INTO BRANCHES 
+VALUES 
+    (1,'Main Branch', '123 Main Street, Cityville', 12345),
+    (2,'Downtown Branch', '456 Downtown Avenue, Townsville', 98765),
+    (3,'Westside Branch', '789 Westside Road, Villageton', 5551234);
+
+select*from BRANCHES;
+
+
+3.Write a SQL statement for implementing ALTER,UPDATE and DELETE?
+
+ALTER Statement:
+-- Add a new column to the Customers table
+ALTER TABLE Customers
+ADD COLUMN Gender VARCHAR(10);
+
+-- Add a foreign key constraint to the Transactions table
+ALTER TABLE Transactions
+ADD CONSTRAINT FK_AccountID
+FOREIGN KEY (AccountID)
+REFERENCES Accounts(AccountID)
+ON DELETE CASCADE;
+
+*UPDATE Statement:
+-- Update the phone number for a specific customer
+UPDATE Customers
+SET Phone = '+1234567890'
+WHERE CustomerID = 1;
+
+-- Update the balance of an account after a transaction
+UPDATE Accounts
+SET Balance = Balance - 1000.00
+WHERE AccountID = 1;
+
+DELETE Statement:
+-- Delete a specific transaction
+DELETE FROM Transactions
+WHERE TransactionID = 100;
+
+-- Delete a customer and all associated accounts and transactions
+DELETE FROM Customers
+WHERE CustomerID = 1;
+
+
+4.Write the queries to implement the joins?
+
+INNER JOIN:
+SELECT Customers.Name, Accounts.AccountType
+FROM Customers
+INNER JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID;
+
+LEFT JOIN:
+SELECT Customers.Name, IFNULL(Accounts.AccountType, 'No Account') AS AccountType
+FROM Customers
+LEFT JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID;
+
+RIGHT JOIN:
+SELECT IFNULL(Customers.Name, 'No Customer') AS Name, Accounts.AccountType
+FROM Customers
+RIGHT JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID;
+
+FULL JOIN (Not supported in MySQL, alternative with UNION):
+
+-- Retrieve all customer-account pairs and show 'No Account' if there's no matching account
+SELECT Customers.Name, IFNULL(Accounts.AccountType, 'No Account') AS AccountType
+FROM Customers
+LEFT JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID
+UNION
+-- Retrieve all accounts without customers and show 'No Customer'
+SELECT IFNULL(Customers.Name, 'No Customer') AS Name, Accounts.AccountType
+FROM Customers
+RIGHT JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID
+WHERE Customers.CustomerID IS NULL;
+
+
+5.Write the query for implementing the following functions: MAX (), MIN (), AVG () and COUNT ().
+SQL queries demonstrating the usage of the MAX(), MIN(), AVG(), and COUNT() functions:
+
+MAX() Function:
+SELECT MAX(Balance) AS MaxBalance
+FROM Accounts;
+
+MIN() Function:
+SELECT MIN(Balance) AS MinBalance
+FROM Accounts;
+
+AVG() Function:
+SELECT AVG(Balance) AS AvgBalance
+FROM Accounts;
+
+COUNT() Function:
+SELECT COUNT(*) AS CustomerCount
+FROM Customers;
+
+6.Write the query to implement the concept of Integrity constrains.
+
+Primary Key Constraint:Ensure that each customer has a unique CustomerID:
+ALTER TABLE Customers
+ADD CONSTRAINT PK_Customers_CustomerID PRIMARY KEY (CustomerID);
+
+Foreign Key Constraint:Ensure that the AccountID in the Transactions table references an 
+existing AccountID in the Accounts table:
+ALTER TABLE Transactions
+ADD CONSTRAINT FK_Transactions_AccountID FOREIGN KEY (AccountID) REFERENCES
+ Accounts(AccountID);
+
+NOT NULL Constraint:Ensure that the Name field in the Customers table cannot be NULL:
+ALTER TABLE Customers
+MODIFY COLUMN Name VARCHAR(100) NOT NULL;
+Check Constraint:Ensure that the balance in the Accounts table is always non-negative:
+
+ALTER TABLE Accounts
+ADD CONSTRAINT CHK_Accounts_Balance CHECK (Balance >= 0);
+Unique Constraint:Ensure that each email address in the Customers table is unique:
+
+ALTER TABLE Customers
+ADD CONSTRAINT UK_Customers_Email UNIQUE (Email);
+Cascade Constraint:Ensure that if a customer is deleted, all their associated accounts and 
+transactions are also deleted:
+
+ALTER TABLE Accounts
+ADD CONSTRAINT FK_Accounts_CustomerID FOREIGN KEY (CustomerID) REFERENCES 
+Customers(CustomerID) ON DELETE CASCADE;
+
+ALTER TABLE Transactions
+ADD CONSTRAINT FK_Transactions_AccountID FOREIGN KEY (AccountID) REFERENCES
+ Accounts(AccountID) ON DELETE CASCADE;
+
+
+7.Write the query to create the views.
+
+Simple View:
+CREATE VIEW CustomerAccounts AS
+SELECT Customers.Name, Accounts.AccountType, Accounts.Balance
+FROM Customers
+INNER JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID;
+
+Complex View with Joins and Calculations:
+CREATE VIEW TransactionDetails AS
+SELECT Customers.Name, Accounts.AccountType, Transactions.TransactionType, 
+Transactions.Amount, Transactions.TransactionDate
+FROM Customers
+INNER JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID
+INNER JOIN Transactions ON Accounts.AccountID = Transactions.AccountID;
+
+
+View with Aggregated Data:
+CREATE VIEW AccountSummary AS
+SELECT Customers.Name, Accounts.AccountType, COUNT(*) AS NumberOfTransactions, 
+SUM(Transactions.Amount) AS TotalAmount
+FROM Customers
+INNER JOIN Accounts ON Customers.CustomerID = Accounts.CustomerID
+INNER JOIN Transactions ON Accounts.AccountID = Transactions.AccountID
+GROUP BY Customers.Name, Accounts.AccountType;
+
+
+8.Perform the queries for triggers.
+Creating a Trigger:
+
+CREATE TRIGGER UpdateBalance
+AFTER INSERT ON Transactions
+FOR EACH ROW
+BEGIN
+    IF NEW.TransactionType = 'Deposit' THEN
+        UPDATE Accounts
+        SET Balance = Balance + NEW.Amount
+        WHERE AccountID = NEW.AccountID;
+    ELSEIF NEW.TransactionType = 'Withdrawal' THEN
+        UPDATE Accounts
+        SET Balance = Balance - NEW.Amount
+        WHERE AccountID = NEW.AccountID;
+    END IF;
+END;
+
+Updating a Trigger:
+-- Assuming you want to modify the action performed by the trigger
+DROP TRIGGER IF EXISTS UpdateBalance;
+
+CREATE TRIGGER UpdateBalance
+AFTER INSERT ON Transactions
+FOR EACH ROW
+BEGIN
+    IF NEW.TransactionType = 'Deposit' THEN
+        UPDATE Accounts
+        SET Balance = Balance + NEW.Amount * 1.1  -- Add a 10% bonus for deposits
+        WHERE AccountID = NEW.AccountID;
+    ELSEIF NEW.TransactionType = 'Withdrawal' THEN
+        UPDATE Accounts
+        SET Balance = Balance - NEW.Amount
+        WHERE AccountID = NEW.AccountID;
+    END IF;
+END;
+
+Dropping a Trigger:
+DROP TRIGGER IF EXISTS UpdateBalance;
+This query drops the trigger named "UpdateBalance" if it exists in the database.
+
+10.Using the referential integrity constraints?
+
+-- Add primary key constraint to Customers table
+ALTER TABLE Customers
+ADD CONSTRAINT PK_Customers_CustomerID PRIMARY KEY (CustomerID);
+
+-- Add foreign key constraint to Accounts table
+ALTER TABLE Accounts
+ADD CONSTRAINT FK_Accounts_CustomerID FOREIGN KEY (CustomerID) 
+REFERENCES Customers(CustomerID);
+
+-- Add foreign key constraint to Transactions table
+ALTER TABLE Transactions
+ADD CONSTRAINT FK_Transactions_AccountID FOREIGN KEY (AccountID) 
+REFERENCES Accounts(AccountID);
+
+11.Write the query for creating the users and their role.
+Creating Users:
+CREATE USER 'new_user'@'localhost' IDENTIFIED BY 'password';
+This command creates a new user named 'new_user' with the password 'password'. Replace 'localhost' with the appropriate hostname or IP address if you want to restrict access to certain hosts.
+
+Granting Privileges and Roles:
+GRANT SELECT, INSERT, UPDATE, DELETE ON database_name.* TO 'new_user'@'localhost';
+This command grants the SELECT, INSERT, UPDATE, and DELETE privileges on all tables in 
+the 'database_name' database to the 'new_user' user.
+
+
+GRANT role_name TO 'new_user'@'localhost';
+This command grants a specific role, identified by 'role_name', to the 'new_user' user.
+
+Creating Roles (Optional):
+CREATE ROLE role_name;
+This command creates a new role named 'role_name'.
+
+Assigning Privileges to Roles:
+GRANT SELECT, INSERT, UPDATE, DELETE ON database_name.* TO role_name;
+This command grants the SELECT, INSERT, UPDATE, and DELETE privileges on all tables in 
+the 'database_name' database to the 'role_name' role.
+
+Assigning Roles to Users:
+GRANT role_name TO 'new_user'@'localhost';
+This command grants the 'role_name' role to the 'new_user' user.
+
+
+
+
+
+
+
+
+

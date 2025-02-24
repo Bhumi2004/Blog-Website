@@ -1,0 +1,46 @@
+
+<html lang="en">
+    <%- include('./partials/head.ejs') %>
+<body>
+
+      <%- include('./partials/nav.ejs') %>
+    <div class="details content">
+        <h2><%= blog.title %></h2>
+        <div class="content">
+            <p><%= blog.body %></p>
+        </div>
+        <a href="#" class="delete" data-doc="<%= blog._id %>">Delete</a>
+        <a href="#" class="update" data-doc="<%= blog._id %>">Update</a>
+        <a href="/blogs/<%= blog._id %>/edit" class="update">Update</a>
+        
+
+
+
+    </div>
+    <%- include('./partials/footer.ejs') %>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const trashcan = document.querySelector('a.delete');
+    
+        if (trashcan) {
+          trashcan.addEventListener('click', (e) => {
+            e.preventDefault();
+            const endpoint = `/blogs/${trashcan.dataset.doc}`;
+    
+            fetch(endpoint, {
+              method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.redirect) {
+                window.location.href = data.redirect;
+              }
+            })
+            .catch(err => console.log(err));
+          });
+        }
+      });
+    </script>
+</body>
+</html>
