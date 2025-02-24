@@ -1,2 +1,2 @@
 ﻿# Blog-Website
- #Live App - https://blog-website-v19e.onrender.com
+ #Live App - https://blog-website-v19e.onrender.com/blogs
